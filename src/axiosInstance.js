@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000", // Remove trailing slash
+  baseURL: "https://api-main-6iz9.onrender.com", // Remove trailing slash
   headers: {
     "Content-Type": "application/json",
   },

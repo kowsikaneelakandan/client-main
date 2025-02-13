@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Swiper, SwiperSlide } from "swiper/react";
-import SwiperCore from "swiper";
-import { useSelector } from "react-redux";
-import { Navigation } from "swiper/modules";
-import "swiper/css/bundle";
 import {
   FaBath,
   FaBed,
   FaChair,
+  FaEdit,
   FaMapMarkerAlt,
   FaParking,
   FaShare,
+  FaTrash
 } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import SwiperCore from "swiper";
+import "swiper/css/bundle";
+import { Navigation } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import axiosInstance from "../axiosInstance"; // Import axiosInstance
 import Contact from "../components/Contact";
-import  axiosInstance  from "../axiosInstance"; // Import axiosInstance
 
 export default function Listing() {
   SwiperCore.use([Navigation]);
@@ -25,6 +27,7 @@ export default function Listing() {
   const [contact, setContact] = useState(false);
   const params = useParams();
   const { currentUser } = useSelector((state) => state.user);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -48,6 +51,25 @@ export default function Listing() {
     fetchListing();
   }, [params.listingId]);
 
+  const onDelete = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true)
+      const { data } = await axiosInstance.delete(`/api/listing/delete/${params.listingId}`);
+      setLoading(false)
+      if (data.success === false) {
+        return;
+      }
+      setError(false);
+      navigate("/search");
+    } catch (error) {
+      setError(true);
+      setLoading(false);
+    }
+  }
+  const OnEdit = () => {
+    navigate(`/update-listing/${params.listingId}`)
+  }
   return (
     <main>
       {loading && <p className="text-center my-7 text-2xl">Loading...</p>}
@@ -134,6 +156,14 @@ export default function Listing() {
                 {listing.furnished ? "Furnished" : "Unfurnished"}
               </li>
             </ul>
+            <div className="flex gap-2">
+              <button className="flex items-center gap-1 text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md border-none cursor-pointer" onClick={OnEdit}>
+                <FaEdit size={16} /> Edit
+              </button>
+              <button className="flex items-center gap-1 text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md border-none cursor-pointer" onClick={onDelete}>
+                <FaTrash size={16} /> Delete
+              </button>
+            </div>
             {currentUser && listing.userRef !== currentUser._id && !contact && (
               <button
                 onClick={() => setContact(true)}

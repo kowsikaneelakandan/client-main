@@ -52,6 +52,15 @@ export default function CreateListing() {
     fetchListing();
   }, []);
 
+  const handleChange = (e) => {
+    const { id, value, type, checked } = e.target;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: type === "checkbox" ? checked : value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -113,6 +122,7 @@ export default function CreateListing() {
             value={formData.address}
           />
         </div>
+        <button>Update</button>
       </form>
     </main>
   );
